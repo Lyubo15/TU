@@ -27,71 +27,105 @@ public class Main {
 
         connection = DriverManager.getConnection(CONNECTION_STRING + DATABASE_NAME, props);
 
-        // 1. Create Table By Given Name and Columns - Example:
-        // create table `product`(`id` int AUTO_INCREMENT primary key, `name` varchar(20), `description` varchar(20), `price` decimal(8,3), `category_id` int);
-        // create table `category` (`id` int AUTO_INCREMENT NOT NULL primary key, `name` varchar(20));
+        System.out.println("INSERT COMMAND, PLEASE: ");
+        String command = reader.readLine();
 
-//        String line = reader.readLine();
-//        String tableName = line.substring(line.indexOf("`"), line.indexOf("("));
-//        String columns = line.substring(line.indexOf("("), line.lastIndexOf(")") + 2);
-//
-//        createTable(tableName, columns);
+        while (!command.equals("END")) {
+            switch (command) {
+                case "CREATE_TABLE":
 
-        // 2. Drop Table By Name
+                    // 1. Create Table By Given Name and Columns - Example:
+                    // create table `product`(`id` int AUTO_INCREMENT primary key, `name` varchar(20), `description` varchar(20), `price` decimal(8,3), `category_id` int);
+                    // create table `category` (`id` int AUTO_INCREMENT NOT NULL primary key, `name` varchar(20));
 
-//        String table = reader.readLine();
-//
-//        dropTable(table);
+                    String line = reader.readLine();
+                    String newTableName = line.substring(line.indexOf("`"), line.indexOf("("));
+                    String columns = line.substring(line.indexOf("("), line.lastIndexOf(")") + 2);
 
-        // 3. List All Tables
+                    createTable(newTableName, columns);
+                    break;
+                case "DROP_TABLE":
+                    // 2. Drop Table By Name
 
-        //listAllTables();
+                    String dropTable = reader.readLine();
 
-        // 4. Get Table Info
+                    dropTable(dropTable);
+                    break;
+                case "LIST_ALL_TABLES":
+                    // 3. List All Tables
 
-//        String table = reader.readLine();
-//
-//        getTableInfo(table);
+                    listAllTables();
+                    break;
+                case "GET_TABLE_INFO":
+                    // 4. Get Table Info
 
-        // 5. Select Products
+                    String table = reader.readLine();
 
-        //selectProducts();
+                    getTableInfo(table);
+                    break;
+                case "SELECT_PRODUCTS":
+                    // 5. Select Products
 
-        // 6. Insert Data
+                    selectProducts();
+                    break;
+                case "INSERT_DATA_INTO_CATEGORY_TABLE":
+                    // 6. Insert Data Into Category Table
 
-//        insertDataIntoCategoryTable();
-//        insertDataIntoProductTable();
+                    Integer id = Integer.parseInt(reader.readLine());
+                    String name = reader.readLine();
 
-        // 7. Delelte Products in a price range
+                    insertDataIntoCategoryTable(id, name);
+                    break;
+                case "INSERT_DATA_INFO_PRODUCT_TABLE":
+                    // 6. Insert Data Into Product Table
 
-//        Integer bottom = Integer.parseInt(reader.readLine());
-//        Integer top = Integer.parseInt(reader.readLine());
-//
-//        deleteProductsWherePriceIsBetween(bottom, top);
+                    Integer productId = Integer.parseInt(reader.readLine());
+                    String productName = reader.readLine();
+                    String description = reader.readLine();
+                    Double price = Double.parseDouble(reader.readLine());
+                    Integer categoryId = Integer.parseInt(reader.readLine());
 
-        // 8. Create Index
-        // Example: CreateIndex SampleId ON product (id)
+                    insertDataIntoProductTable(productId, productName, description, price, categoryId);
+                    break;
+                case "DELETE_PRODUCTS":
+                    // 7. Delelte Products in a price range
 
-//        String line = reader.readLine();
-//
-//        String indexName = line.substring(line.indexOf(" ") + 1, line.indexOf("ON") - 1);
-//        String tableName = line.substring(line.indexOf("ON") + 3, line.indexOf("(") - 1);
-//        String columnName = line.substring(line.indexOf("(") + 1, line.indexOf(")"));
-//
-//        createIndex(indexName, tableName, columnName);
+                    Integer bottom = Integer.parseInt(reader.readLine());
+                    Integer top = Integer.parseInt(reader.readLine());
 
-        // 9. Drop Index
+                    deleteProductsWherePriceIsBetween(bottom, top);
+                    break;
+                case "CREATE_INDEX":
+                    // 8. Create Index
+                    // Example: CreateIndex SampleId ON product (id)
 
-        String index = reader.readLine();
-        String table = reader.readLine();
+                    String input = reader.readLine();
 
-        dropIndex(index, table);
+                    String indexName = input.substring(input.indexOf(" ") + 1, input.indexOf("ON") - 1);
+                    String tableName = input.substring(input.indexOf("ON") + 3, input.indexOf("(") - 1);
+                    String columnName = input.substring(input.indexOf("(") + 1, input.indexOf(")"));
+
+                    createIndex(indexName, tableName, columnName);
+                    break;
+                case "DROP_INDEX":
+                    // 9. Drop Index
+
+                    String index = reader.readLine();
+                    String tableToDrop = reader.readLine();
+
+                    dropIndex(index, tableToDrop);
+                    break;
+            }
+
+            System.out.println("INSERT COMMAND, PLEASE: ");
+            command = reader.readLine();
+        }
     }
 
     private static void createTable(String tableName, String columns) {
         String query = "create table " + tableName + columns;
 
-        try{
+        try {
             statement = connection.prepareStatement(query);
 
             statement.execute();
@@ -99,7 +133,7 @@ public class Main {
             connection.close();
 
             System.out.println("Table created successfully.");
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -107,7 +141,7 @@ public class Main {
     private static void dropTable(String tableName) {
         String query = "drop table " + tableName;
 
-        try{
+        try {
             statement = connection.prepareStatement(query);
 
             statement.execute();
@@ -115,13 +149,13 @@ public class Main {
             connection.close();
 
             System.out.println("Table dropped successfully.");
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private static void listAllTables() {
-        try{
+        try {
             DatabaseMetaData md = connection.getMetaData();
             ResultSet rs = md.getTables(DATABASE_NAME, null, "%", null);
 
@@ -130,7 +164,7 @@ public class Main {
             }
 
             connection.close();
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -187,11 +221,13 @@ public class Main {
         }
     }
 
-    private static void insertDataIntoCategoryTable() {
+    private static void insertDataIntoCategoryTable(Integer id, String name) {
         QUERY = "INSERT INTO `category`(`id`, `name`) \n" +
-                "VALUES (1, 'MALE CLOTHES'), (2, 'FEMALE CLOTHES');";
+                "VALUES (?, ?);";
         try {
             statement = connection.prepareStatement(QUERY);
+            statement.setInt(1, id);
+            statement.setString(2, name);
 
             statement.execute();
             statement.close();
@@ -202,11 +238,16 @@ public class Main {
         }
     }
 
-    private static void insertDataIntoProductTable() {
-        QUERY =  "INSERT INTO `product` (`id`, `name`, `description`, `price`, `category_id`) \n" +
-                "VALUES (1, 'Product 1', 'Long descriptions', 100, 1), (2, 'Product 2', 'Description ....', 200, 2), (3, 'Product 3', 'Description ....', 250, 2);";
+    private static void insertDataIntoProductTable(Integer id, String name, String description, Double price, Integer categoryId) {
+        QUERY = "INSERT INTO `product` (`id`, `name`, `description`, `price`, `category_id`) \n" +
+                "VALUES (?, ?, ?, ?, ?);";
         try {
             statement = connection.prepareStatement(QUERY);
+            statement.setInt(1, id);
+            statement.setString(2, name);
+            statement.setString(3, description);
+            statement.setDouble(4, price);
+            statement.setInt(5, categoryId);
 
             statement.execute();
             statement.close();
